@@ -1,0 +1,179 @@
+#include "Map.h"
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+Map::Map()
+{
+    Map::mapInitialise();
+    Map::mapStatusInitialise();
+    Map::backgroundInitialise();
+}
+
+void Map::backgroundInitialise( void )
+{
+    //create visual background map
+    backgroundSetTop(0);
+    for( int y = 1; y < Y_SIZEBACKGROUND; y+=4 )
+    {
+        for(int i = 0; i < 3; i++)
+        {
+            backgroundSetRow( y + i );
+        }
+
+
+        if(y > ( Y_SIZEBACKGROUND - 7 ) )
+        {
+            backgroundSetBottom(y+3);
+        }
+        else
+        {
+            backgroundSetFlat(y+3);
+        }
+    }
+}
+
+void Map::mapInitialise( void )
+{
+    //Create empty map
+    for( int y = 0; y < Y_SIZE; y++ )
+    {
+        for( int x = 0; x < X_SIZE; x++ )
+        {
+            map[x][y] = MAP_SPACE;
+        }
+    }
+}
+
+void Map::mapStatusInitialise( void )
+{
+    //Create empty map
+    for( int y = 0; y < Y_SIZE; y++ )
+    {
+        for( int x = 0; x < X_SIZE; x++ )
+        {
+            mapStatus[x][y] = 1;
+        }
+    }
+}
+
+void Map::backgroundSetRow( int y )
+{
+    mapBackground[0][y] = MAP_STRAIGHT;
+
+    for( int x = 1; x < X_SIZEBACKGROUND; x+=6 )
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            mapBackground[x+i][y] = MAP_SPACE;
+        }
+        mapBackground[x+5][y] = MAP_STRAIGHT;
+
+    }
+}
+
+void Map::backgroundSetFlat( int y )
+{
+    mapBackground[0][y] = MAP_RIGHT;
+
+    for( int x = 1; x < X_SIZEBACKGROUND - 1; x+=6 )
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            mapBackground[x+i][y] = MAP_FLAT;
+        }
+        mapBackground[x+5][y] = MAP_CROSS;
+
+    }
+    mapBackground[X_SIZEBACKGROUND - 1][y] = MAP_LEFT;
+}
+
+void Map::backgroundSetTop( int y )
+{
+    mapBackground[0][y] = MAP_CORNER_UP_LEFT;
+
+    for( int x = 1; x < X_SIZEBACKGROUND - 1; x+=6 )
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            mapBackground[x+i][y] = MAP_FLAT;
+        }
+        mapBackground[x+5][y] = MAP_TOP;
+
+    }
+    mapBackground[X_SIZEBACKGROUND - 1][y] = MAP_CORNER_UP_RIGHT;
+}
+
+void Map::backgroundSetBottom( int y )
+{
+    mapBackground[0][y] = MAP_CORNER_BOTTOM_LEFT;
+
+    for( int x = 1; x < X_SIZEBACKGROUND - 1; x+=6 )
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            mapBackground[x+i][y] = MAP_FLAT;
+        }
+        mapBackground[x+5][y] = MAP_BOTTOM;
+
+    }
+    mapBackground[X_SIZEBACKGROUND - 1][y] = MAP_CORNER_BOTTOM_RIGHT;
+}
+
+std::string Map::toString()
+{
+    Map::mapBuild();
+
+    std::stringstream mapStringStream;
+
+    for( int y = 0; y < Y_SIZEBACKGROUND; y++ )
+    {
+        for( int x = 0; x < X_SIZEBACKGROUND; x++ )
+        {
+            mapStringStream << mapBackground[x][y];
+        }
+        mapStringStream << std::endl;
+    }
+    return mapStringStream.str();
+}
+
+void Map::setStatus( int x, int y, int status )
+{
+    mapStatus[x][y] = status;
+}
+
+
+void Map::mapBuild( void )
+{
+    char status;
+
+    Map::backgroundInitialise();
+
+    for( int y = 0; y < Y_SIZE; y++ )
+    {
+        for( int x = 0; x < X_SIZE; x++ )
+        {
+            mapBackground[x*6+1][y*4+1] = Map::statusChar( mapStatus[x][y] );
+        }
+    }
+}
+
+char Map::statusChar( int status )
+{
+    char statusChar;
+
+    switch( status )
+        {
+        case 0:     //no status
+        statusChar = MAP_SPACE;
+        break;
+        case 1:     //selected
+        statusChar = MAP_SELECTED;
+        break;
+        case 2:     //exploded
+        statusChar = MAP_SPACE;
+        break;
+        }
+    return statusChar;
+}
