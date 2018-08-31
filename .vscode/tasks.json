@@ -1,0 +1,32 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build application",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-Wall", "--std=c++11",
+                "-g", "src/Display.cpp", "src/Game.cpp", "src/Map.cpp", "src/Unit.cpp", "main.cpp",
+                "-o", "${workspaceFolder}/BattleSimulator.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "run application",
+            "type": "shell",
+            "command": "${workspaceFolder}/BattleSimulator.exe",
+            "args": [],
+            "presentation": {
+                "reveal": "always"
+            },
+            "dependsOn": [
+                "build application"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
